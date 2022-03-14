@@ -1,5 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
+import { register, continueWithGoogle } from "../../../Store/Actions/Auth";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   width: 100vw;
@@ -30,6 +33,7 @@ const Title = styled.h1`
 const Form = styled.form`
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: 20px;
 `;
 
 const Input = styled.input`
@@ -53,24 +57,79 @@ const Button = styled.button`
   cursor: pointer;
 `;
 
+const OAuthBtn = styled.button`
+  padding: 15px 20px;
+  background: transparent;
+  color: #209b87;
+  cursor: pointer;
+  margin: auto;
+  width: 100%;
+  margin-bottom: 10px;
+  border: #209b87 1px solid;
+`;
+
 export default function Register() {
+  const auth = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const { name, email, password, confirmPassword } = formData;
+
+  const onChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    if (password !== confirmPassword) return;
+    register(email, password);
+  };
+
+  if (auth.isAuthenticated) navigate("/");
   return (
     <Container>
       <Wrapper>
         <Title>CREATE AN ACCOUNT</Title>
         <Form>
-          <Input placeholder="name" />
-          <Input placeholder="last name" />
-          <Input placeholder="username" />
-          <Input placeholder="email" />
-          <Input placeholder="password" />
-          <Input placeholder="confirm password" />
+          <Input
+            placeholder="name"
+            name={"name"}
+            value={name}
+            onChange={(e) => onChange(e)}
+          />
+          <Input
+            placeholder="email"
+            name={"email"}
+            value={email}
+            onChange={(e) => onChange(e)}
+          />
+          <Input
+            placeholder="password"
+            name={"password"}
+            value={password}
+            onChange={(e) => onChange(e)}
+          />
+          <Input
+            placeholder="confirm password"
+            name={"confirmPassword"}
+            value={confirmPassword}
+            onChange={(e) => onChange(e)}
+          />
           <Agreement>
             By creating an account, I consent to the processing of my personal
             data in accordance with the <b>PRIVACY POLICY</b>
           </Agreement>
-          <Button>CREATE</Button>
+          <Button onClick={(e) => onSubmit(e)}>CREATE</Button>
         </Form>
+        <OAuthBtn onClick={() => continueWithGoogle()}>
+          Sign In With Google
+        </OAuthBtn>
+        <OAuthBtn>Sign In With Phone</OAuthBtn>
       </Wrapper>
     </Container>
   );

@@ -2,6 +2,9 @@ import React from "react";
 import styled from "styled-components";
 import { Search, ShoppingCartOutlined } from "@material-ui/icons";
 import { Badge } from "@material-ui/core";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { logOut } from "../../Store/Actions/Auth";
 
 const Container = styled.div`
   height: 60px;
@@ -60,6 +63,8 @@ const MenuItem = styled.div`
 `;
 
 export default function Navbar() {
+  const auth = useSelector((state) => state.auth);
+  const navigate = useNavigate();
   return (
     <Container>
       <Wrapper>
@@ -74,13 +79,26 @@ export default function Navbar() {
           <Logo>Ecommerce</Logo>
         </Center>
         <Right>
-          <MenuItem>Register</MenuItem>
-          <MenuItem>Sign In</MenuItem>
+          {!auth.isAuthenticated && (
+            <>
+              <MenuItem onClick={() => navigate("/register")}>
+                Register
+              </MenuItem>
+              <MenuItem>Sign In</MenuItem>
+            </>
+          )}
+
           <MenuItem>
             <Badge>
               <ShoppingCartOutlined />
             </Badge>
+            My Cart
           </MenuItem>
+          {auth.isAuthenticated && (
+            <>
+              <MenuItem onClick={logOut}>Log Out</MenuItem>
+            </>
+          )}
         </Right>
       </Wrapper>
     </Container>
